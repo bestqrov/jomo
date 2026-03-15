@@ -1,8 +1,9 @@
+"use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Car, Gauge, Clock, FileText, Settings, Users, Wrench, Fuel, Calendar, CreditCard, Briefcase, UserCheck, FileWarning, ShieldCheck, ClipboardList, FileSignature, FileCheck2, FileBadge, FileBarChart, FileCog, FileInput, FileOutput, FileSearch, FileSpreadsheet, FileText as FileTextIcon, FileX, FilePlus, FileMinus, FileEdit, FileLock, FileUnlock, FileUser, FileUserCheck, FileUserX, FileUserPlus, FileUserMinus, FileUserEdit, FileUserCog, FileUserLock, FileUserUnlock, FileUserShield, FileUserBadge, FileUserBarChart, FileUserInput, FileUserOutput, FileUserSearch, FileUserSpreadsheet, FileUserText, FileUserX2, FileUserPlus2, FileUserMinus2, FileUserEdit2, FileUserCog2, FileUserLock2, FileUserUnlock2, FileUserShield2, FileUserBadge2, FileUserBarChart2, FileUserInput2, FileUserOutput2, FileUserSearch2, FileUserSpreadsheet2, FileUserText2, FileUserX3, FileUserPlus3, FileUserMinus3, FileUserEdit3, FileUserCog3, FileUserLock3, FileUserUnlock3, FileUserShield3, FileUserBadge3, FileUserBarChart3, FileUserInput3, FileUserOutput3, FileUserSearch3, FileUserSpreadsheet3, FileUserText3 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Home, Car, Gauge, Clock, FileText, Settings, Users, Wrench, Fuel, Calendar, CreditCard, Briefcase, UserCheck, FileWarning, ShieldCheck, ClipboardList, FileSignature, FileCheck2, FileBadge, FileBarChart, FileCog, FileInput, FileOutput, FileSearch, FileSpreadsheet, FileText as FileTextIcon, FileX, FilePlus, FileMinus, FileEdit, Lock, Unlock, FileUser, FileUserCheck, FileUserMinus, FileUserCog, FileUserBadge, FileUserBarChart, FileUserInput, FileUserOutput, FileUserSearch, FileUserSpreadsheet, FileUserText, Plus, X, Shield } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 const sections = [
   {
@@ -89,11 +90,11 @@ const sections = [
     icon: Users,
     links: [
       { label: 'Collaborateurs', href: '/hr/collaborateurs', icon: UserCheck },
-      { label: 'Absences', href: '/hr/absences', icon: FileUserX },
-      { label: 'Conges', href: '/hr/conges', icon: FileUserPlus },
-      { label: 'Formations', href: '/hr/formations', icon: FileUserEdit },
-      { label: 'Visite medicale', href: '/hr/visite-medicale', icon: FileUserShield },
-      { label: 'Visas', href: '/hr/visas', icon: FileUserLock },
+      { label: 'Absences', href: '/hr/absences', icon: X },
+      { label: 'Conges', href: '/hr/conges', icon: Plus },
+      { label: 'Formations', href: '/hr/formations', icon: FileEdit },
+      { label: 'Visite medicale', href: '/hr/visite-medicale', icon: Shield },
+      { label: 'Visas', href: '/hr/visas', icon: Lock },
       { label: 'Passeports', href: '/hr/passeports', icon: FileUser },
     ],
   },
