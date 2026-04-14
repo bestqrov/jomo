@@ -5,7 +5,7 @@ import FactureList from "@/components/vehicle/FactureList";
 import FactureForm from "@/components/vehicle/FactureForm";
 import React, { Suspense } from "react";
 
-export default function AdminTransportPage() {
+function TransportContent() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const [showFactureForm, setShowFactureForm] = React.useState(false);
@@ -19,7 +19,14 @@ export default function AdminTransportPage() {
           <FactureList onAdd={() => setShowFactureForm(true)} />
         )
       ) : null}
-      {/* Add other transport tab content here as needed */}
     </div>
+  );
+}
+
+export default function AdminTransportPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-gray-400">Chargement...</div>}>
+      <TransportContent />
+    </Suspense>
   );
 }

@@ -31,7 +31,7 @@ import SinistreList from "@/components/administratif/SinistreList";
 import ContratLeasingForm from "@/components/administratif/ContratLeasingForm";
 import ContratLeasingList from "@/components/administratif/ContratLeasingList";
 
-export default function AdminAdministratifPage() {
+function AdminAdministratifContent() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const [showVignetteForm, setShowVignetteForm] = React.useState(false);
@@ -164,5 +164,13 @@ export default function AdminAdministratifPage() {
       ) : null}
       {/* Add other tab content here as needed */}
     </div>
+  );
+}
+
+export default function AdminAdministratifPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-gray-400">Chargement...</div>}>
+      <AdminAdministratifContent />
+    </Suspense>
   );
 }

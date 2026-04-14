@@ -24,7 +24,7 @@ import RemplacementForm from "@/components/vehicle/RemplacementForm";
 import FactureList from "@/components/vehicle/FactureList";
 import FactureForm from "@/components/vehicle/FactureForm";
 
-export default function AdminFlotsPage() {
+function AdminFlotsContent() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
@@ -107,5 +107,13 @@ export default function AdminFlotsPage() {
       ) : null}
       {/* Add other tab content here as needed */}
     </div>
+  );
+}
+
+export default function AdminFlotsPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-gray-400">Chargement...</div>}>
+      <AdminFlotsContent />
+    </Suspense>
   );
 }
