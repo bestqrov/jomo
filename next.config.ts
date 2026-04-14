@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
     // Type errors are fixed progressively — don't block production builds
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
 };
 
 export default nextConfig;

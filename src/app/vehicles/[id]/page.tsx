@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import VehicleHeader from '@/components/vehicle/VehicleHeader';
 import VehicleStats from '@/components/vehicle/VehicleStats';

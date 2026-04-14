@@ -1,3 +1,4 @@
+"use client";
 import AgenciesPage from '@/components/superadmin/AgenciesPage';
 
 export default function Agencies() {
