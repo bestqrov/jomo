@@ -35,6 +35,7 @@ export default function AdminAdministratifPage() {
   const tab = searchParams.get("tab");
   const [showVignetteForm, setShowVignetteForm] = React.useState(false);
   const [showCarteGriseForm, setShowCarteGriseForm] = React.useState(false);
+  const [editingCarteGrise, setEditingCarteGrise] = React.useState(null);
   const [showTaxeForm, setShowTaxeForm] = React.useState(false);
   const [showVisiteTechniqueForm, setShowVisiteTechniqueForm] = React.useState(false);
   const [showAgrementForm, setShowAgrementForm] = React.useState(false);
@@ -59,9 +60,28 @@ export default function AdminAdministratifPage() {
       ) : null}
       {tab === "cartes-grises" ? (
         showCarteGriseForm ? (
-          <CarteGriseForm />
+          <CarteGriseForm
+            initialData={editingCarteGrise || {}}
+            onSaved={() => {
+              setShowCarteGriseForm(false);
+              setEditingCarteGrise(null);
+            }}
+            onCancel={() => {
+              setShowCarteGriseForm(false);
+              setEditingCarteGrise(null);
+            }}
+          />
         ) : (
-          <CarteGriseList onAdd={() => setShowCarteGriseForm(true)} />
+          <CarteGriseList
+            onAdd={() => {
+              setEditingCarteGrise(null);
+              setShowCarteGriseForm(true);
+            }}
+            onEdit={(carte: any) => {
+              setEditingCarteGrise(carte);
+              setShowCarteGriseForm(true);
+            }}
+          />
         )
       ) : null}
       {tab === "contrats-leasing" ? (

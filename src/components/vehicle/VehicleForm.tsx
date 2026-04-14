@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 const initialState = {
   designation: "",
@@ -29,11 +31,60 @@ const initialState = {
   tva: "",
 };
 
+
 const VehicleForm: React.FC = () => {
   const [form, setForm] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (newVehicle: typeof initialState) => {
+      const { data } = await axios.post('/api/v1/flotte/vehicles', newVehicle);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      setSuccess(true);
+      setForm(initialState);
+      setFieldErrors({});
+    },
+    onError: (err: any) => {
+      setError(err.message || "Erreur lors de l'enregistrement");
+    },
+    onSettled: () => setLoading(false),
+  });
+
+  // Per-field validation
+  const validateField = (name: string, value: any) => {
+    switch (name) {
+      case "designation":
+        if (!value.trim()) return "Désignation est requise";
+        break;
+      case "immatricule":
+        if (!value.trim()) return "Immatricule est requis";
+        break;
+      case "typeAcquisition":
+        if (!value) return "Type d'acquisition est requis";
+        break;
+      // Add more field-specific validation as needed
+      default:
+        return "";
+    }
+    return "";
+  };
+
+  // Validate all fields
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    Object.entries(form).forEach(([key, value]) => {
+      const err = validateField(key, value);
+      if (err) errors[key] = err;
+    });
+    return errors;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type, checked } = e.target;
@@ -41,6 +92,14 @@ const VehicleForm: React.FC = () => {
       ...form,
       [name]: type === "checkbox" ? checked : value,
     });
+    // Clear error on change
+    setFieldErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const err = validateField(name, value);
+    setFieldErrors((prev) => ({ ...prev, [name]: err }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,21 +108,22 @@ const VehicleForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccess(false);
-    try {
-      // TODO: Replace with actual API endpoint
-      // await fetch(...)
-      setSuccess(true);
-      setForm(initialState);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    const errors = validateForm();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setError("Veuillez corriger les erreurs ci-dessous.");
+      // Focus first invalid field
+      const firstErrorField = Object.keys(errors)[0];
+      const el = document.getElementsByName(firstErrorField)[0];
+      if (el) el.focus();
+      return;
     }
+    setLoading(true);
+    mutation.mutate(form);
   };
 
   return (
@@ -71,6 +131,9 @@ const VehicleForm: React.FC = () => {
       onSubmit={handleSubmit}
       className="w-full max-w-6xl mx-auto bg-gradient-to-br from-blue-100 via-blue-50 to-blue-200 p-12 rounded-3xl shadow-2xl border-2 border-blue-300"
     >
+      {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">Véhicule enregistré avec succès !</div>}
+      {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
+      {loading && <div className="mb-4 p-3 bg-blue-100 text-blue-700 rounded">Enregistrement...</div>}
       <h2 className="text-3xl font-bold mb-10 text-blue-700 text-center tracking-wide bg-blue-200 py-4 rounded-2xl shadow-md">Véhicule</h2>
       {/* Identification Section */}
       <div className="mb-8 bg-white rounded-2xl shadow-lg p-8 border border-blue-200">
@@ -78,11 +141,13 @@ const VehicleForm: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-blue-700 font-semibold mb-1">Désignation <span className="text-red-500">*</span></label>
-            <input type="text" name="designation" value={form.designation} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" required />
+            <input type="text" name="designation" value={form.designation} onChange={handleChange} onBlur={handleBlur} className="w-full px-4 py-2 rounded-lg border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" required />
+            {fieldErrors.designation && <div className="text-red-600 text-xs mt-1">{fieldErrors.designation}</div>}
           </div>
           <div>
             <label className="block text-blue-700 font-semibold mb-1">Immatricule <span className="text-red-500">*</span></label>
-            <input type="text" name="immatricule" value={form.immatricule} onChange={handleChange} className="w-full px-4 py-2 rounded-lg border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" required />
+            <input type="text" name="immatricule" value={form.immatricule} onChange={handleChange} onBlur={handleBlur} className="w-full px-4 py-2 rounded-lg border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" required />
+            {fieldErrors.immatricule && <div className="text-red-600 text-xs mt-1">{fieldErrors.immatricule}</div>}
           </div>
           <div>
             <label className="block text-blue-700 font-semibold mb-1">Type d'acquisition <span className="text-red-500">*</span></label>
@@ -90,6 +155,7 @@ const VehicleForm: React.FC = () => {
               name="typeAcquisition"
               value={form.typeAcquisition}
               onChange={handleChange}
+              onBlur={handleBlur}
               className="w-full px-4 py-2 rounded-lg border-2 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
               required
             >
@@ -98,6 +164,7 @@ const VehicleForm: React.FC = () => {
               <option value="leasing">Leasing</option>
               <option value="location">Location</option>
             </select>
+            {fieldErrors.typeAcquisition && <div className="text-red-600 text-xs mt-1">{fieldErrors.typeAcquisition}</div>}
           </div>
           <div>
             <label className="block text-blue-700 font-semibold mb-1">Nom</label>

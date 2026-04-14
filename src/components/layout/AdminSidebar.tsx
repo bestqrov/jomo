@@ -34,6 +34,7 @@ const sections = [
       { label: "Véhicules de remplacement", icon: FileText, href: "/admin/flots?tab=remplacement" },
       { label: "Equipements véhicule", icon: FileText, href: "/admin/flots?tab=equipements" },
       { label: "Véhicules réformés", icon: FileText, href: "/admin/flots?tab=reformes" },
+      { label: "Factures", icon: FileText, href: "/admin/flots?tab=factures" },
     ]
   },
   {
@@ -77,30 +78,40 @@ const sections = [
   { label: "Parametres", icon: Settings, href: "/admin/settings" },
 ];
 
+import { usePathname, useSearchParams } from "next/navigation";
+
 export default function AdminSidebar() {
   const [expandedSections, setExpandedSections] = useState({});
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  // Build the full path including query string
+  const fullPath = searchParams.toString() ? `${pathname}?${searchParams.toString()}` : pathname;
 
   const toggleSection = (label) => {
     setExpandedSections((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
+  // Remove Parametres from main sections for unique bottom button
+  const mainSections = sections.filter((s) => s.label !== "Parametres");
+  const paramSection = sections.find((s) => s.label === "Parametres");
+
   return (
     <aside className="h-screen w-60 bg-blue-700 border-r shadow-lg flex flex-col p-4 fixed top-0 left-0 z-30">
-      <div className="mb-8 flex items-center gap-2 px-2">
+      <div className="mb-6 flex items-center gap-2 px-2">
         <span className="text-2xl font-extrabold text-white tracking-tight">ArwaPark</span>
         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full ml-2">Admin</span>
       </div>
       <nav className="flex-1 overflow-y-auto">
-        <ul className="space-y-2">
-          {sections.map((section, idx) => (
+        <ul className="space-y-1">
+          {mainSections.map((section, idx) => (
             <li key={section.label + idx}>
               {section.children ? (
-                <div className="mb-1 mt-4 flex items-center justify-between px-2">
-                  <span className="text-xs font-bold uppercase tracking-wider px-1 py-0.5 rounded border-l-4 border-yellow-400 text-yellow-300 drop-shadow-sm" style={{fontFamily:'serif', letterSpacing:'0.08em'}}>{section.label}</span>
+                <div className="mb-1 mt-3 flex items-center justify-between px-1">
+                  <span className="text-xs font-bold uppercase tracking-wider px-1 py-0.5 rounded border-l-4 border-green-400 text-green-200 bg-blue-800/60" style={{fontFamily:'serif', letterSpacing:'0.08em', borderColor:'#22c55e'}}>{section.label}</span>
                   {section.children.length > 4 && (
                     <button
                       aria-label={expandedSections[section.label] ? 'Show less' : 'Show more'}
-                      className="ml-2 text-yellow-300 hover:text-yellow-400 focus:outline-none"
+                      className="ml-2 text-green-200 hover:text-green-400 focus:outline-none"
                       onClick={() => toggleSection(section.label)}
                       type="button"
                     >
@@ -109,28 +120,44 @@ export default function AdminSidebar() {
                   )}
                 </div>
               ) : null}
-              <ul className="space-y-1">
+              <ul className="space-y-0.5">
                 {(section.children
                   ? expandedSections[section.label]
                     ? section.children
                     : section.children.slice(0, 4)
                   : [section]
-                ).map((item) => (
-                  <li key={item.label}>
-                    <Link
-                      href={item.href}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-blue-100 hover:bg-blue-600 hover:text-white transition group"
-                    >
-                      <item.icon className="w-5 h-5 text-blue-200 group-hover:text-white" />
-                      <span className="font-medium font-sans text-[15px] tracking-tight" style={{fontFamily:'Poppins,Arial,sans-serif'}}>{item.label}</span>
-                    </Link>
-                  </li>
-                ))}
+                ).map((item) => {
+                  // Compare full path (pathname + search) to item.href for exact match
+                  const isSelected = fullPath === item.href;
+                  return (
+                    <li key={item.label}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition group
+                          ${isSelected ? "bg-green-600 text-white font-bold" : "text-blue-100 hover:bg-blue-600 hover:text-white"}`}
+                      >
+                        <item.icon className={`w-5 h-5 ${isSelected ? "text-white" : "text-blue-200 group-hover:text-white"}`} />
+                        <span className="font-medium font-sans text-[15px] tracking-tight" style={{fontFamily:'Poppins,Arial,sans-serif'}}>{item.label}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </li>
           ))}
         </ul>
       </nav>
+      {/* Unique Parametres button at bottom */}
+      {paramSection && (
+        <Link
+          href={paramSection.href}
+          className={`mt-6 flex items-center gap-3 px-3 py-3 rounded-lg text-blue-100 bg-blue-900 hover:bg-green-600 hover:text-white transition font-bold border-t border-blue-800 ${pathname && pathname.startsWith(paramSection.href) ? "bg-green-600 text-white" : ""}`}
+          style={{marginTop:'auto'}}
+        >
+          <paramSection.icon className="w-5 h-5" />
+          <span className="font-medium font-sans text-[15px] tracking-tight">{paramSection.label}</span>
+        </Link>
+      )}
     </aside>
   );
 }

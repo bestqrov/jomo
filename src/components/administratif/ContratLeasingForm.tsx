@@ -1,6 +1,12 @@
 "use client";
 import { useState } from "react";
 
+type ContratLeasingFormProps = {
+  onCancel?: () => void;
+  onSave?: (data: any) => void;
+  initialData?: Record<string, any>;
+};
+
 const initialState = {
   numero: "",
   dateContrat: "",
@@ -27,7 +33,7 @@ const initialState = {
   avenantDateFin: "",
 };
 
-export default function ContratLeasingForm({ onCancel, onSave, initialData }) {
+export default function ContratLeasingForm({ onCancel, onSave, initialData }: ContratLeasingFormProps) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
 
@@ -36,17 +42,37 @@ export default function ContratLeasingForm({ onCancel, onSave, initialData }) {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      onSave?.(form);
-      setLoading(false);
-    }, 600);
+    setError("");
+    setSuccess(false);
+    try {
+      const res = await fetch("/api/v1/administratif/contrats-leasing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form)
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Erreur lors de l'enregistrement");
+      } else {
+        setSuccess(true);
+        onSave?.(form);
+      }
+    } catch (e) {
+      setError("Erreur serveur");
+    }
+    setLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-gradient-to-br from-blue-50 via-white to-blue-100 rounded-3xl shadow-2xl p-8 border-2 border-blue-300 max-w-2xl mx-auto">
+      {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">Contrat enregistré avec succès !</div>}
+      {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
       <h3 className="text-2xl font-extrabold text-blue-700 mb-6 text-center tracking-wide">Contrat de leasing</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Informations générales */}

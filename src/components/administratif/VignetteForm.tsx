@@ -1,9 +1,11 @@
 "use client";
 import React, { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function VignetteForm() {
   const [form, setForm] = useState({
     vehicle: "",
+    numero: "",
     dateDebut: "",
     dateFin: "",
     montantPrincipal: "",
@@ -13,6 +15,8 @@ export default function VignetteForm() {
     timbre: "",
     tvaFraisService: "",
     montantTotal: "",
+    fournisseur: "",
+    etat: "valide",
     attachement: null,
     commentaire: ""
   });
@@ -28,6 +32,7 @@ export default function VignetteForm() {
   const handleCancel = () => {
     setForm({
       vehicle: "",
+      numero: "",
       dateDebut: "",
       dateFin: "",
       montantPrincipal: "",
@@ -37,14 +42,76 @@ export default function VignetteForm() {
       timbre: "",
       tvaFraisService: "",
       montantTotal: "",
+      fournisseur: "",
+      etat: "valide",
       attachement: null,
       commentaire: ""
     });
   };
 
+  const queryClient = useQueryClient();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess(false);
+    try {
+      const payload = {
+        vehicule: form.vehicle,
+        numero: form.numero || `${form.vehicle || 'vignette'}-${Date.now()}`,
+        dateEmission: form.dateDebut,
+        dateExpiration: form.dateFin,
+        montant: Number(form.montantTotal || form.montantPrincipal || 0),
+        fournisseur: form.fournisseur,
+        etat: form.etat,
+        commentaire: form.commentaire,
+      };
+
+      const res = await fetch("/api/v1/administratif/vignettes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Erreur lors de l'enregistrement");
+      } else {
+        setSuccess(true);
+        queryClient.invalidateQueries({ queryKey: ["vignettes"] });
+        setForm({
+          vehicle: "",
+          numero: "",
+          dateDebut: "",
+          dateFin: "",
+          montantPrincipal: "",
+          penalite: "",
+          majoration: "",
+          fraisService: "",
+          timbre: "",
+          tvaFraisService: "",
+          montantTotal: "",
+          fournisseur: "",
+          etat: "valide",
+          attachement: null,
+          commentaire: ""
+        });
+      }
+    } catch (e) {
+      setError("Erreur serveur");
+    }
+    setLoading(false);
+  };
+
   return (
-    <form className="max-w-xl mx-auto bg-white rounded-lg shadow-lg p-8 mt-8 border-t-8 border-yellow-400">
+    <form className="max-w-xl mx-auto bg-white rounded-lg shadow-lg p-8 mt-8 border-t-8 border-yellow-400" onSubmit={handleSubmit}>
       <div className="mb-8 text-center">
+        {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">Vignette enregistrée avec succès !</div>}
+        {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
+        {loading && <div className="mb-4 p-3 bg-yellow-100 text-yellow-700 rounded">Enregistrement...</div>}
         <h2 className="text-3xl font-bold text-yellow-600 tracking-tight mb-1">Vignette</h2>
         <p className="text-gray-500">Informations générales</p>
       </div>
@@ -52,6 +119,22 @@ export default function VignetteForm() {
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Véhicule</label>
           <input name="vehicle" value={form.vehicle} onChange={handleChange} className="w-full border rounded px-3 py-2 focus:ring-yellow-400 focus:border-yellow-400" placeholder="Entrer le véhicule" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Numéro de vignette</label>
+          <input name="numero" value={form.numero} onChange={handleChange} className="w-full border rounded px-3 py-2 focus:ring-yellow-400 focus:border-yellow-400" placeholder="Entrer le numéro" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Fournisseur</label>
+          <input name="fournisseur" value={form.fournisseur} onChange={handleChange} className="w-full border rounded px-3 py-2 focus:ring-yellow-400 focus:border-yellow-400" placeholder="Entrer le fournisseur" />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">État</label>
+          <select name="etat" value={form.etat} onChange={handleChange} className="w-full border rounded px-3 py-2 focus:ring-yellow-400 focus:border-yellow-400">
+            <option value="valide">Valide</option>
+            <option value="expiré">Expiré</option>
+            <option value="en_attente">En attente</option>
+          </select>
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">Date début</label>

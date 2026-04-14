@@ -1,5 +1,7 @@
 "use client";
+
 import { useState } from "react";
+import axios from "axios";
 
 const initialState = {
   numero: "",
@@ -30,23 +32,79 @@ const initialState = {
 export default function LeasingForm({ onCancel, onSave, initialData }) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  // Per-field validation
+  const validateField = (name, value) => {
+    switch (name) {
+      case "numero":
+        if (!value.trim()) return "Numéro du contrat est requis";
+        break;
+      case "dateContrat":
+        if (!value) return "Date du contrat est requise";
+        break;
+      default:
+        return "";
+    }
+    return "";
+  };
+
+  // Validate all fields
+  const validateForm = () => {
+    const errors = {};
+    Object.entries(form).forEach(([key, value]) => {
+      const err = validateField(key, value);
+      if (err) errors[key] = err;
+    });
+    return errors;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  const handleSubmit = (e) => {
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const err = validateField(name, value);
+    setFieldErrors((prev) => ({ ...prev, [name]: err }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSuccess("");
+    setError("");
+    const errors = validateForm();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setError("Veuillez corriger les erreurs ci-dessous.");
+      // Focus first invalid field
+      const firstErrorField = Object.keys(errors)[0];
+      const el = document.getElementsByName(firstErrorField)[0];
+      if (el) el.focus();
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await axios.post("/api/v1/flotte/leasings", form);
+      setSuccess("Enregistré avec succès !");
       onSave?.(form);
+      setForm(initialState);
+      setFieldErrors({});
+    } catch (err) {
+      setError("Erreur lors de l'enregistrement.");
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-transparent max-w-2xl mx-auto">
+      {success && <div className="mb-2 text-blue-700 font-semibold">{success}</div>}
+      {error && <div className="mb-2 text-red-600 font-semibold">{error}</div>}
       <h3 className="text-lg font-bold text-blue-700 mb-4 text-center tracking-wide">Contrat de leasing</h3>
       {/* Section 1: Informations générales */}
       <div className="bg-white rounded-xl shadow p-4 border border-blue-200 mb-4">
@@ -54,11 +112,13 @@ export default function LeasingForm({ onCancel, onSave, initialData }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="block text-blue-800 text-xs font-semibold mb-1">Numéro du contrat <span className="text-red-500">*</span></label>
-            <input name="numero" value={form.numero} onChange={handleChange} required className="w-full px-2 py-1 border rounded focus:ring-2 focus:ring-blue-300 text-sm" />
+            <input name="numero" value={form.numero} onChange={handleChange} onBlur={handleBlur} required className="w-full px-2 py-1 border rounded focus:ring-2 focus:ring-blue-300 text-sm" />
+            {fieldErrors.numero && <div className="text-red-600 text-xs mt-1">{fieldErrors.numero}</div>}
           </div>
           <div>
             <label className="block text-blue-800 text-xs font-semibold mb-1">Date du contrat <span className="text-red-500">*</span></label>
-            <input type="date" name="dateContrat" value={form.dateContrat} onChange={handleChange} required className="w-full px-2 py-1 border rounded focus:ring-2 focus:ring-blue-300 text-sm" />
+            <input type="date" name="dateContrat" value={form.dateContrat} onChange={handleChange} onBlur={handleBlur} required className="w-full px-2 py-1 border rounded focus:ring-2 focus:ring-blue-300 text-sm" />
+            {fieldErrors.dateContrat && <div className="text-red-600 text-xs mt-1">{fieldErrors.dateContrat}</div>}
           </div>
           <div>
             <label className="block text-blue-800 text-xs font-semibold mb-1">Concessionnaire</label>

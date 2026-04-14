@@ -17,8 +17,11 @@ import AchatList from "@/components/vehicle/AchatList";
 import AchatForm from "@/components/vehicle/AchatForm";
 import EquipementList from "@/components/vehicle/EquipementList";
 import EquipementForm from "@/components/vehicle/EquipementForm";
+
 import RemplacementList from "@/components/vehicle/RemplacementList";
 import RemplacementForm from "@/components/vehicle/RemplacementForm";
+import FactureList from "@/components/vehicle/FactureList";
+import FactureForm from "@/components/vehicle/FactureForm";
 
 export default function AdminFlotsPage() {
   const searchParams = useSearchParams();
@@ -34,6 +37,7 @@ export default function AdminFlotsPage() {
   const [showAchatForm, setShowAchatForm] = React.useState(false);
   const [showEquipementForm, setShowEquipementForm] = React.useState(false);
   const [showRemplacementForm, setShowRemplacementForm] = React.useState(false);
+  const [showFactureForm, setShowFactureForm] = React.useState(false);
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -91,6 +95,13 @@ export default function AdminFlotsPage() {
           <RemplacementForm onCancel={() => setShowRemplacementForm(false)} />
         ) : (
           <RemplacementList onAdd={() => setShowRemplacementForm(true)} />
+        )
+      ) : null}
+      {tab === "factures" ? (
+        showFactureForm ? (
+          <FactureForm onCancel={() => setShowFactureForm(false)} />
+        ) : (
+          <FactureList onAdd={() => setShowFactureForm(true)} />
         )
       ) : null}
       {/* Add other tab content here as needed */}

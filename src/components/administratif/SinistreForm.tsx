@@ -42,7 +42,7 @@ const SinistreForm: React.FC<SinistreFormProps> = ({ onSuccess }) => {
     setError("");
     setSuccess(false);
     try {
-      const res = await fetch("/api/administratif/sinistres", {
+      const res = await fetch("/api/v1/administratif/sinistres", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

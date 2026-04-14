@@ -26,7 +26,7 @@ const AutorisationCirculationForm: React.FC<AutorisationCirculationFormProps> = 
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/administratif/autorisations-circulation", {
+      const res = await fetch("/api/v1/administratif/autorisation-circulation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

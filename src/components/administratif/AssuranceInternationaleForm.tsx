@@ -30,7 +30,7 @@ const AssuranceInternationaleForm: React.FC<AssuranceInternationaleFormProps> = 
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/administratif/assurances-internationales", {
+      const res = await fetch("/api/v1/administratif/assurances-internationales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

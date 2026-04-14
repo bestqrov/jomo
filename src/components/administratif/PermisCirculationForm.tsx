@@ -29,7 +29,7 @@ const PermisCirculationForm: React.FC<PermisCirculationFormProps> = ({ onSuccess
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/administratif/permis-circulations", {
+      const res = await fetch("/api/v1/administratif/permis-circulations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

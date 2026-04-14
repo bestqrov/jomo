@@ -32,17 +32,64 @@ const carburantOptions = [
   { value: "4/4", label: "4/4" },
 ];
 
+
 export default function RemplacementForm({ onCancel, onSave, initialData }) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [error, setError] = useState("");
+
+  // Per-field validation
+  const validateField = (name, value) => {
+    switch (name) {
+      case "vehicule":
+        if (!value) return "Véhicule est requis";
+        break;
+      case "dateDemande":
+        if (!value) return "Date de demande est requise";
+        break;
+      // Add more field-specific validation as needed
+      default:
+        return "";
+    }
+    return "";
+  };
+
+  // Validate all fields
+  const validateForm = () => {
+    const errors = {};
+    Object.entries(form).forEach(([key, value]) => {
+      const err = validateField(key, value);
+      if (err) errors[key] = err;
+    });
+    return errors;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const err = validateField(name, value);
+    setFieldErrors((prev) => ({ ...prev, [name]: err }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setError("");
+    const errors = validateForm();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setError("Veuillez corriger les erreurs ci-dessous.");
+      // Focus first invalid field
+      const firstErrorField = Object.keys(errors)[0];
+      const el = document.getElementsByName(firstErrorField)[0];
+      if (el) el.focus();
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       onSave?.(form);
@@ -63,6 +110,7 @@ export default function RemplacementForm({ onCancel, onSave, initialData }) {
           name="vehicule"
           value={form.vehicule}
           onChange={handleChange}
+          onBlur={handleBlur}
           className="w-full px-2 py-1 border rounded focus:ring-2 focus:ring-yellow-300 text-sm"
           required
           disabled={loadingVehicles}
@@ -74,6 +122,8 @@ export default function RemplacementForm({ onCancel, onSave, initialData }) {
             </option>
           ))}
         </select>
+        {fieldErrors.vehicule && <div className="text-red-600 text-xs mt-1">{fieldErrors.vehicule}</div>}
+        {error && <div className="mb-2 text-red-600 text-center">{error}</div>}
       </div>
       {/* Section 2: Informations générales */}
       <div className="bg-white rounded-xl shadow p-4 border border-yellow-200 mb-4">

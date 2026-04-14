@@ -30,7 +30,7 @@ const CarnetMetrologiqueForm: React.FC<CarnetMetrologiqueFormProps> = ({ onSucce
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/administratif/carnets-metrologiques", {
+      const res = await fetch("/api/v1/administratif/carnets-metrologiques", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

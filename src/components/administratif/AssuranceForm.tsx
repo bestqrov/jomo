@@ -34,7 +34,7 @@ const AssuranceForm: React.FC<AssuranceFormProps> = ({ onSuccess }) => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/administratif/assurances", {
+      const res = await fetch("/api/v1/administratif/assurances", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
