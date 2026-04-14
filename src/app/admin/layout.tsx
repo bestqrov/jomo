@@ -2,7 +2,7 @@
 
 import AdminSidebar from '@/components/layout/AdminSidebar';
 import AdminTopbar from '@/components/layout/AdminTopbar';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   // TODO: Replace with global/profile state
@@ -14,7 +14,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex">
-      <AdminSidebar />
+      <Suspense fallback={<div className="w-60 h-screen bg-blue-700" />}>
+        <AdminSidebar />
+      </Suspense>
       <div className="flex-1 ml-60 min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
         <AdminTopbar logoUrl={logoUrl} steName={steName} adminName={adminName} />
         <main className="flex-1 p-8">

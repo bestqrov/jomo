@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+export const dynamic = "force-dynamic";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import VehicleForm from "@/components/vehicle/VehicleForm";
 import VehicleList from "@/components/vehicle/VehicleList";

@@ -1,6 +1,7 @@
 "use client";
+export const dynamic = "force-dynamic";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import VignetteForm from "@/components/administratif/VignetteForm";
 import VignetteList from "@/components/administratif/VignetteList";

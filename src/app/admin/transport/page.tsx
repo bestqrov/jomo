@@ -1,8 +1,9 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useSearchParams } from "next/navigation";
 import FactureList from "@/components/vehicle/FactureList";
 import FactureForm from "@/components/vehicle/FactureForm";
-import React from "react";
+import React, { Suspense } from "react";
 
 export default function AdminTransportPage() {
   const searchParams = useSearchParams();
