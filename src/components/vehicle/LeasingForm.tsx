@@ -29,7 +29,7 @@ const initialState = {
   avenantDateFin: "",
 };
 
-export default function LeasingForm({ onCancel, onSave, initialData }) {
+export default function LeasingForm({ onCancel, onSave = () => {}, initialData = null }) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");

@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 
-export default function IndexeHoraireForm({ onCancel, onSave, initialData }) {
+export default function IndexeHoraireForm({ onCancel, onSave = () => {}, initialData = null }) {
   const [vehicule, setVehicule] = useState(initialData?.vehicule || "");
   const [date, setDate] = useState(initialData?.date || "");
   const [h, setH] = useState(initialData?.h || "");

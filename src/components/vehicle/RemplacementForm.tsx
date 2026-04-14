@@ -33,7 +33,7 @@ const carburantOptions = [
 ];
 
 
-export default function RemplacementForm({ onCancel, onSave, initialData }) {
+export default function RemplacementForm({ onCancel, onSave = () => {}, initialData = null }) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});

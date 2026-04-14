@@ -10,7 +10,7 @@ const initialState = {
   commentaire: "",
 };
 
-export default function ReformeForm({ onCancel, onSave, initialData }) {
+export default function ReformeForm({ onCancel, onSave = () => {}, initialData = null }) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});

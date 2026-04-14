@@ -27,7 +27,7 @@ const initialState = {
   plafondPneumatique: "",
 };
 
-export default function LocationForm({ onCancel, onSave, initialData }) {
+export default function LocationForm({ onCancel, onSave = () => {}, initialData = null }) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
 

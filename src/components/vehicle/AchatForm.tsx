@@ -14,7 +14,7 @@ const initialState = {
 };
 
 
-export default function AchatForm({ onCancel, onSave, initialData }) {
+export default function AchatForm({ onCancel, onSave = () => {}, initialData = null }) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");

@@ -28,7 +28,7 @@ interface FactureFormProps {
   initialData?: typeof initialState;
 }
 
-export default function FactureForm({ onCancel, onSave, initialData }: FactureFormProps) {
+export default function FactureForm({ onCancel, onSave = () => {}, initialData = null }: FactureFormProps) {
   const [form, setForm] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
   const { data, isLoading: loadingVehicles } = useVehicles();
